@@ -45,7 +45,16 @@ foodImg.src = "./src/assets/cat.jpeg"
 let direction, loopId
 
 const drawFood = () => {
-    ctx.drawImage(foodImg, food.x, food.y, size, size)
+    const scale = 2 // você pode aumentar pra 2.0 ou mais se quiser maior
+    const newSize = size * scale
+
+    ctx.drawImage(
+        foodImg,
+        food.x - (newSize - size) / 2,
+        food.y - (newSize - size) / 2,
+        newSize,
+        newSize
+    )
 }
 
 
