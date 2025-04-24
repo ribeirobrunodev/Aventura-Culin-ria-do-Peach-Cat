@@ -39,18 +39,15 @@ const food = {
     y: randomPosition(),
     color: randomColor()
 }
+const foodImg = new Image()
+foodImg.src = "./src/assets/cat.jpeg"
 
 let direction, loopId
 
 const drawFood = () => {
-    const { x, y, color } = food
-
-    ctx.shadowColor = color
-    ctx.shadowBlur = 6
-    ctx.fillStyle = color
-    ctx.fillRect(x, y, size, size)
-    ctx.shadowBlur = 0
+    ctx.drawImage(foodImg, food.x, food.y, size, size)
 }
+
 
 const drawSnake = () => {
     ctx.fillStyle = "#ddd"
