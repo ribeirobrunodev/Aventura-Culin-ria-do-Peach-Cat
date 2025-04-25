@@ -174,3 +174,14 @@ function move(dir) {
     if (dir === "left" && direction !== "right") direction = "left"
     if (dir === "right" && direction !== "left") direction = "right"
 }
+
+// ▶️ Botão "Jogar novamente"
+buttonPlay.addEventListener("click", () => {
+    score.innerText = "00"
+    menu.style.display = "none"
+    canvas.style.filter = "none"
+    snake = [initialPosition]
+    direction = undefined
+    gameLoop()
+})
+
