@@ -1,34 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link rel="stylesheet" href="./src/CSS/style.css">
-    
-    <title>Peach Cat💘💘</title>
-</head>
-<body>
-    <div class="score">😍score: <span class="score--value">00</span></div>
-
-    <div class="menu-screen">
-        <span class="game-over">☠️game over☠️</span>
-        <span class="final-score">Pontuação <span>00</span></span>
-
-        <button class="btn-play">
-            <span class="material-symbols-outlined">🤯</span>
-            Jogar novamente 😘😍
-        </button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Peach Cat 😍</title>
+    <link rel="stylesheet" href="static/styles.css" />
+    <link rel="icon" type="image/x-icon" href="gat5.gif" />
+    <link rel="preload" href="index.js" as="script" />
+    <style>
+      #start-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000000cc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        flex-direction: column;
+      }
+      #start-screen img {
+        width: 150px;
+        height: auto;
+      }
+      #start-message {
+        color: white;
+        font-size: 1.5em;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="start-screen">
+      <img src="gat5.gif" alt="Gato Início" />
+      <div id="start-message">Pressione Enter para começar</div>
     </div>
 
-    <canvas width="600" height="600"></canvas>
-   <!---- <img src="./src/assets/gat6.gif" style="position: absolute; top: 570px; left: 560px; width: 30px; height: 30px;">
-    <img src="./src/assets/cat.dance.gif" style="position: absolute; top: 580px; left: 900px; width: 30px; height: 30px;">
-    <img src="./src/assets/cat2.gif" style="position: absolute; top: 480px; left: 640px; width: 30px; height: 30px;">
-  -->
+    <div id="timer-div">Tempo: <span id="time">03:00</span></div>
 
-    <script src="./src/js/script.js"></script>
-</body>
+    <div class="lives-and-score">
+      <div class="space"></div>
+      <div>Score <span id="score">0</span></div>
+      <div id="lives"></div>
+      <div class="space"></div>
+    </div>
+
+    <main>
+      <div id="game-container">
+        <div class="grid"></div>
+      </div>
+    </main>
+
+    <script src="index.js"></script>
+  </body>
 </html>
