@@ -364,6 +364,44 @@ main {
       max-width: 700px; /* aumenta o canvas no desktop */
     }
   }
+  #mobile-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+    z-index: 100;
+  }
+  
+  #mobile-controls button {
+    background-color: #ffc107;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+  }
+  
+  #pause-menu {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #333;
+    color: white;
+    padding: 20px;
+    font-size: 20px;
+    border-radius: 15px;
+    text-align: center;
+    display: none;
+    z-index: 200;
+  }
+  
+  #pause-menu.show {
+    display: block;
+  }
   
 
 }

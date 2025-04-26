@@ -1,59 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Peach Cat 😍</title>
-    <link rel="stylesheet" href="static/styles.css" />
-    <link rel="icon" type="image/x-icon" href="gat5.gif" />
-    <link rel="preload" href="index.js" as="script" />
-    <style>
-      #start-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: #000000cc;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        flex-direction: column;
-      }
-      #start-screen img {
-        width: 150px;
-        height: auto;
-      }
-      #start-message {
-        color: white;
-        font-size: 1.5em;
-        margin-top: 20px;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="start-screen">
-      <img src="gat5.gif" alt="Gato Início" />
-      <div id="start-message">Pressione Enter para começar</div>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peach Cat 😍</title>
+  <link rel="stylesheet" href="static/styles.css" />
+  <link rel="icon" type="image/x-icon" href="gat5.gif" />
+  <link rel="preload" href="index.js" as="script" />
+  <style>
+    #start-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000000cc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      flex-direction: column;
+    }
+    #start-screen img {
+      width: 150px;
+      height: auto;
+    }
+    #start-message {
+      color: white;
+      font-size: 1.5em;
+      margin-top: 20px;
+    }
+
+    /* Tela de Game Over */
+    .menu-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      display: none; /* escondido no início */
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      color: white;
+    }
+    .menu-screen .game-over {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+    .menu-screen .final-score {
+      font-size: 2em;
+      margin-bottom: 30px;
+    }
+    .btn-play {
+      padding: 10px 20px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 10px;
+      background-color: #ff69b4;
+      color: white;
+      cursor: pointer;
+    }
+    .btn-play:hover {
+      background-color: #ff85c1;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="start-screen">
+    <img src="gat5.gif" alt="Gato Início" />
+    <div id="start-message">Pressione Enter para começar</div>
+  </div>
+
+  <div id="timer-div">Tempo: <span id="time">03:00</span></div>
+  
+  <!-- Tela de Game Over -->
+  <div class="menu-screen" id="game-over-screen">
+    <span class="game-over">Game Over</span>
+    <span class="final-score">Score <span id="final-score">00</span></span>
+    <button class="btn-play" onclick="restartGame()">
+      Jogar novamente
+    </button>
+  </div>
+
+  <div class="lives-and-score">
+    <div class="space"></div>
+    <div>Score <span id="score">0</span></div>
+    <div id="lives"></div>
+    <div class="space"></div>
+  </div>
+
+  <main>
+    <div id="game-container">
+      <div class="grid"></div>
     </div>
+  </main>
+<!-- CONTROLES MOBILE -->
+<div id="mobile-controls">
+  <button id="left-button">◀️</button>
+  <button id="right-button">▶️</button>
+</div>
 
-    <div id="timer-div">Tempo: <span id="time">03:00</span></div>
+<!-- ÁUDIO -->
+<audio id="hit-sound" src="./static/audio.mp3" preload="auto"></audio>
 
-    <div class="lives-and-score">
-      <div class="space"></div>
-      <div>Score <span id="score">0</span></div>
-      <div id="lives"></div>
-      <div class="space"></div>
-    </div>
 
-    <main>
-      <div id="game-container">
-        <div class="grid"></div>
-      </div>
-    </main>
 
-    <script src="index.js"></script>
-  </body>
+  <script src="index.js"></script>
+
+  <script>
+    // Função para mostrar o Game Over
+    function showGameOver(finalScore) {
+      document.getElementById('final-score').textContent = finalScore;
+      document.getElementById('game-over-screen').style.display = 'flex';
+    }
+
+    // Função para reiniciar a página (recarrega o jogo)
+    function restartGame() {
+      location.reload();
+    }
+  </script>
+</body>
 </html>

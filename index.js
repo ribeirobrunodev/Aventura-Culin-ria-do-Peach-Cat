@@ -1,63 +1,51 @@
-// Global variables related to each element, character, and state in the game.
+// Global variables
 var gameContainer = document.querySelector("#game-container");
-var gameContainerRect = gameContainer.getBoundingClientRect();
 var grid = document.querySelector(".grid");
+var gameContainerRect = gameContainer.getBoundingClientRect();
 var gameStart = false;
 var win = false;
 var paused = false;
 var timesup = false;
-
 var lifeLost = false;
 var lifeLostDirectionChange = false;
 var lives = document.getElementById("lives");
-
-// Pause menu element
 var pauseMenu = document.querySelector("#pause-menu");
-
-// Start screen element
 const startScreen = document.getElementById("start-screen");
 
-// Image preloader
+// Preload
 let img = new Image();
 
+// Ball class
 class Ball {
   constructor(left, bottom, direction, directionX, random) {
-    this.direction = direction;
     this.left = left;
     this.bottom = bottom;
+    this.direction = direction;
     this.directionX = directionX;
     this.random = random;
   }
-
-  moveUp() {
-    this.bottom += 3;
-  }
-  moveDown() {
-    this.bottom -= 3;
-  }
-  moveLeft() {
-    this.left -= 3;
-  }
-  moveRight() {
-    this.left += 3;
-  }
+  moveUp() { this.bottom += 3; }
+  moveDown() { this.bottom -= 3; }
+  moveLeft() { this.left -= 3; }
+  moveRight() { this.left += 3; }
   moveRandom() {
-    if (random == 0) random = -1.5;
-    this.left += random;
+    if (this.random == 0) this.random = -1.5;
+    this.left += this.random;
   }
 }
 
-let random = Math.floor(Math.random() * (4 - -4 + 1)) + -4;
+// Setup
+let random = Math.floor(Math.random() * 9) - 4;
 let ballClass = new Ball(0, 68, null, null, random);
 
 var blocks = [];
 function CreateGrid() {
   for (var i = 0; i < 40; i++) {
     var rectangle = document.createElement("img");
-    rectangle.src = "static/1.gif";
     if (i >= 10 && i <= 19) rectangle.src = "static/3.gif";
     else if (i >= 20 && i <= 29) rectangle.src = "static/5.gif";
     else if (i >= 30 && i <= 40) rectangle.src = "static/2.gif";
+    else rectangle.src = "static/1.gif";
 
     rectangle.style.objectFit = "scale-down";
     rectangle.style.border = "solid 1px yellow";
@@ -85,12 +73,7 @@ function DisplayLives() {
 }
 DisplayLives();
 
-var player = document.createElement("div");
-var ball = document.createElement("img");
-var ballbox = document.createElement("div");
-
-var water = document.createElement("div");
-var ballbox = document.createElement("div");
+// Create water
 var water = document.createElement("div");
 function CreateWater() {
   water.id = "water";
@@ -102,21 +85,21 @@ function CreateWater() {
 }
 CreateWater();
 
+// Create player
+var player = document.createElement("div");
 function CreatePlayer() {
   player.id = "player";
   player.style.height = "15px";
   player.style.width = "120px";
-  player.style.transform = `translateX(${
-    gameContainerRect.width / 2 - 120 / 2
-  }px)`;
+  player.style.position = "absolute";
   player.style.bottom = "50px";
   player.style.marginLeft = "1px";
-  player.style.position = "absolute";
-  document.querySelector("#game-container").appendChild(player);
+  player.style.transform = `translateX(${gameContainerRect.width / 2 - 60}px)`;
+  gameContainer.appendChild(player);
 }
 CreatePlayer();
 
-var position = gameContainerRect.width / 2 - 120 / 2 - 1;
+var position = gameContainerRect.width / 2 - 60;
 var sCount = 0;
 var pCount = 1;
 
@@ -141,75 +124,25 @@ function drawPlayer() {
   player.style.transform = `translateX(${position}px)`;
 }
 
+// Create ball
+var ball = document.createElement("img");
+var ballbox = document.createElement("div");
 ball.id = "sprite";
 ball.src = "./src/assets/gat5.gif";
 ball.style.position = "absolute";
-
 ballbox.className = "ballbox";
 ballbox.appendChild(ball);
 gameContainer.appendChild(ballbox);
 
-ballbox.style.left = `${
-  gameContainerRect.width / 2 - ballbox.getBoundingClientRect().width / 2
-}px`;
+ballbox.style.left = `${gameContainerRect.width / 2 - ballbox.getBoundingClientRect().width / 2}px`;
 
-var topEdge, rightEdge, leftEdge, brickBottomCollision, pCollision;
+// Collision and Movement
 var c = 2;
 var ballRec = ballbox.getBoundingClientRect();
 var gameRect = gameContainer.getBoundingClientRect();
 
-function CreateWater() {
-  water.id = "water";
-  water.style.position = "absolute";
-  water.style.width = "100%";
-  water.style.height = "43px";
-  water.style.bottom = "0px";
-  gameContainer.appendChild(water);
-}
-CreateWater();
-
-var topEdge, rightEdge, leftEdge, brickBottomCollision, pCollision;
-
-function MoveBall() {
-  CheckCollision();
-  ballbox.style.transform = `translate(${ballClass.left}px,${
-    -ballClass.bottom + 66
-  }px)`;
-
-  if (ballClass.direction == "up") ballClass.moveUp();
-  if (ballClass.direction == "down") ballClass.moveDown();
-
-  if (
-    (rightEdge && ballClass.directionX == "left") ||
-    (pCollision && ballClass.directionX == "left")
-  )
-    ballClass.moveLeft();
-  else if (
-    (leftEdge && ballClass.directionX == "right") ||
-    (pCollision && ballClass.directionX == "right")
-  )
-    ballClass.moveRight();
-
-  if (ballClass.directionX == null) ballClass.moveRandom();
-
-  if (ballClass.bottom <= 30) {
-    ballClass.moveUp();
-    lifeLost = true;
-    return;
-  }
-}
-
-var frontEndScore = document.querySelector("#score");
-
-var url = window.location.href;
-function trim() {
-  if (url.includes("index.html")) {
-    url = window.location.href.slice(0, -10);
-  }
-}
-trim();
-
 window.addEventListener("resize", bricksDimensions);
+
 function bricksDimensions() {
   gameRect = gameContainer.getBoundingClientRect();
   blocks.forEach((rec) => {
@@ -229,7 +162,6 @@ function CheckCollision() {
   if (ballRec.top <= gameRect.top) {
     ballClass.moveDown();
     ballClass.direction = "down";
-    topEdge = true;
   }
 
   blocks.forEach((brick) => {
@@ -245,16 +177,13 @@ function CheckCollision() {
       brick.style.opacity = "0";
       brick.className = "hidden";
       ballClass.direction = "down";
-      brickBottomCollision = true;
-      topEdge = false;
       changeSrc();
       lifeLostDirectionChange = false;
-      return;
     }
   });
 
   var gridLength = grid.querySelectorAll(".hidden").length;
-  frontEndScore.textContent = gridLength;
+  document.querySelector("#score").textContent = gridLength;
 
   if (gridLength == 40) {
     win = true;
@@ -267,9 +196,6 @@ function CheckCollision() {
     ballRec.left <= playerRect.right
   ) {
     ballClass.direction = "up";
-    pCollision = true;
-    topEdge = false;
-    brickBottomCollision = false;
     changeSrc();
   }
 
@@ -281,28 +207,37 @@ function CheckCollision() {
   }
 
   if (ballRec.right >= gameRect.right) {
-    rightEdge = true;
-    leftEdge = false;
-    ball.src = "gat5.gif";
     ballClass.directionX = "left";
   }
 
   if (ballRec.left <= gameRect.left) {
-    leftEdge = true;
-    rightEdge = false;
-    ball.src = "gat5.gif";
     ballClass.directionX = "right";
   }
 }
 
-var sCount = 0;
-var pCount = 1;
+function MoveBall() {
+  CheckCollision();
+  ballbox.style.transform = `translate(${ballClass.left}px,${-ballClass.bottom + 66}px)`;
 
+  if (ballClass.direction == "up") ballClass.moveUp();
+  if (ballClass.direction == "down") ballClass.moveDown();
+
+  if (ballClass.directionX == "left") ballClass.moveLeft();
+  else if (ballClass.directionX == "right") ballClass.moveRight();
+
+  if (ballClass.directionX == null) ballClass.moveRandom();
+
+  if (ballClass.bottom <= 30) {
+    ballClass.moveUp();
+    lifeLost = true;
+    return;
+  }
+}
+
+// Start Game
 function start(event) {
   if (event.key === "Enter" && sCount === 0) {
-    if (startScreen) {
-      startScreen.style.display = "none"; // Esconde a tela inicial
-    }
+    if (startScreen) startScreen.style.display = "none";
     ball.src = `./src/assets/gat5.gif`;
     ball.id = "";
     ball.className = "center";
@@ -319,12 +254,14 @@ function start(event) {
     pCount++;
   }
 
-  if (paused === true && event.key === "r") {
+  if (paused && event.key === "r") {
     Reload();
   }
 }
 
 window.addEventListener("keydown", MovePlayer);
+
+// Main loop
 function Game() {
   if (gameStart && !paused) {
     MoveBall();
@@ -332,23 +269,22 @@ function Game() {
     bricksDimensions();
   }
   if (win) {
-    alert("" + "Parabéns! Você ganhou!😍");
+    alert("Parabéns! Você ganhou!😍");
     clearInterval(timerId);
     return;
   }
   if (timesup) {
-    alert("GAME OVER!Tempo acabou!");
+    alert("GAME OVER! Tempo acabou!");
     return;
   }
   if (lifeLost) {
     lives.removeChild(lives.lastChild);
     lifeLost = false;
     lifeLostDirectionChange = true;
-
     if (document.querySelectorAll(".life").length == 0) {
-      alert("Game over!Tenta novamente.😘");
+      alert("Game over! Tente novamente. 😘");
       clearInterval(timerId);
-      window.location.reload(); // Reinicia o jogo após clicar em OK
+      window.location.reload();
       return;
     }
   }
@@ -357,6 +293,7 @@ function Game() {
   }
 }
 
+// Timer and Pause/Resume
 function Reload() {
   gameStart = false;
   window.location.reload();
@@ -364,19 +301,17 @@ function Reload() {
 
 let timerId;
 function startTimer(duration, display) {
-  var timer = duration,
-    minutes,
-    seconds;
+  var timer = duration;
   timerId = setInterval(function () {
     if (!timesup) {
-      minutes = parseInt(timer / 60, 10);
-      seconds = parseInt(timer % 60, 10);
+      let minutes = parseInt(timer / 60, 10);
+      let seconds = parseInt(timer % 60, 10);
       minutes = minutes < 10 ? "0" + minutes : minutes;
       seconds = seconds < 10 ? "0" + seconds : seconds;
       display.textContent = minutes + ":" + seconds;
       if (timer-- <= 0) {
         timesup = true;
-        return;
+        clearInterval(timerId);
       }
     }
   }, 1000);
@@ -384,8 +319,8 @@ function startTimer(duration, display) {
 
 let display = document.querySelector("#time");
 function InitTimer() {
-  let twoMin = 60 * 3;
-  startTimer(twoMin, display);
+  let threeMin = 60 * 3;
+  startTimer(threeMin, display);
 }
 
 function Pause() {
@@ -415,74 +350,19 @@ function changeSrc() {
   ball.src = "gat5.gif";
 }
 
-let leftbtn = document.getElementById("leftbtn");
-let rightbtn = document.getElementById("rightbtn");
-
-leftbtn.addEventListener("touchstart", MoveLeft);
-rightbtn.addEventListener("touchstart", MoveRight);
-
-function preventZoom(e) {
-  var t2 = e.timeStamp;
-  var t1 = e.currentTarget.dataset.lastTouch || t2;
-  var dt = t2 - t1;
-  var fingers = e.touches.length;
-  e.currentTarget.dataset.lastTouch = t2;
-  if (!dt || dt > 500 || fingers > 1) return;
-  e.preventDefault();
-  e.target.click();
-}
-
-function MoveLeft(e) {
-  preventZoom(e);
-  if (!gameStart) {
-    ball.src = `gat5.gif`;
-    ball.id = "";
-    ball.className = "center";
-    gameStart = true;
-    Game();
-    InitTimer();
-  }
-  if (position >= 29) {
-    position -= 18;
-    player.style.transform = `translateX(${position}px)`;
-  }
-  if (position == 11) {
-    position -= 11;
-    player.style.transform = `translateX(${position}px)`;
-  }
-}
-
-function MoveRight(e) {
-  preventZoom(e);
-  if (!gameStart) {
-    ball.src = `gat5.gif`;
-    ball.id = "";
-    ball.className = "center";
-    gameStart = true;
-    Game();
-    InitTimer();
-  }
-  if (position <= 227) {
-    position += 18;
-  }
-  player.style.transform = `translateX(${position}px)`;
-}
-
 function preloadImage(url) {
   img.src = url;
 }
 
-gameLoop();
-
+// MOBILE TOUCH CONTROLS
 let touchStartX = null;
 let touchStartY = null;
 
-canvas.addEventListener("touchstart", handleTouchStart);
-canvas.addEventListener("touchmove", handleTouchMove);
-canvas.addEventListener("touchend", handleTouchEnd);
+gameContainer.addEventListener("touchstart", handleTouchStart);
+gameContainer.addEventListener("touchmove", handleTouchMove);
+gameContainer.addEventListener("touchend", handleTouchEnd);
 
 function handleTouchStart(event) {
-  event.preventDefault();
   const touch = event.touches[0];
   touchStartX = touch.clientX;
   touchStartY = touch.clientY;
@@ -490,21 +370,24 @@ function handleTouchStart(event) {
 
 function handleTouchMove(event) {
   if (!touchStartX || !touchStartY) return;
-  event.preventDefault();
   const touch = event.touches[0];
-  const touchEndX = touch.clientX;
-  const touchEndY = touch.clientY;
-  const deltaX = touchEndX - touchStartX;
-  const deltaY = touchEndY - touchStartY;
-  const sensitivity = 20;
+  const deltaX = touch.clientX - touchStartX;
+  const deltaY = touch.clientY - touchStartY;
+  const sensitivity = 30;
 
-  if (Math.abs(deltaX) > sensitivity || Math.abs(deltaY) > sensitivity) {
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 0 && direction !== "left") direction = "right";
-      else if (deltaX < 0 && direction !== "right") direction = "left";
-    } else {
-      if (deltaY > 0 && direction !== "up") direction = "down";
-      else if (deltaY < 0 && direction !== "down") direction = "up";
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (deltaX > sensitivity) {
+      // Swipe para direita
+      if (position < gameContainerRect.width - 120) {
+        position += 18;
+        drawPlayer();
+      }
+    } else if (deltaX < -sensitivity) {
+      // Swipe para esquerda
+      if (position > 0) {
+        position -= 18;
+        drawPlayer();
+      }
     }
     touchStartX = null;
     touchStartY = null;
@@ -516,36 +399,77 @@ function handleTouchEnd(event) {
   touchStartY = null;
 }
 
-document.addEventListener("keydown", ({ key }) => {
-  if (key === "ArrowRight" && direction !== "left") direction = "right";
-  if (key === "ArrowLeft" && direction !== "right") direction = "left";
-  if (key === "ArrowDown" && direction !== "up") direction = "down";
-  if (key === "ArrowUp" && direction !== "down") direction = "up";
-});
 
-function move(dir) {
-  if (dir === "up" && direction !== "down") direction = "up";
-  if (dir === "down" && direction !== "up") direction = "down";
-  if (dir === "left" && direction !== "right") direction = "left";
-  if (dir === "right" && direction !== "left") direction = "right";
-}
+// SOM QUANDO ACERTA BLOCOS
+const hitSound = document.getElementById("hit-sound");
 
-buttonPlay.addEventListener("click", () => {
-  score.innerText = "00";
-  menu.style.display = "none";
-  canvas.style.filter = "none";
-  snake = [initialPosition];
-  direction = undefined;
-  gameLoop();
-});
-
-function checkMobile() {
-  if (window.innerWidth <= 768) {
-    if (mobileControls) mobileControls.style.display = "flex";
-  } else {
-    if (mobileControls) mobileControls.style.display = "none";
+function playHitSound() {
+  if (hitSound) {
+    hitSound.currentTime = 0;
+    hitSound.play();
   }
 }
 
-checkMobile();
-window.addEventListener("resize", checkMobile);
+// MODIFICAR CheckCollision() para tocar o som:
+function CheckCollision() {
+  if (c % 3 == 0) ballRec = ballbox.getBoundingClientRect();
+  c++;
+
+  var playerRect = player.getBoundingClientRect();
+
+  if (ballRec.top <= gameRect.top) {
+    ballClass.moveDown();
+    ballClass.direction = "down";
+  }
+
+  blocks.forEach((brick) => {
+    var l = parseFloat(brick.dataset.left);
+    var r = parseFloat(brick.dataset.right);
+    var b = parseFloat(brick.dataset.bottom);
+    if (
+      brick.className != "hidden" &&
+      b >= ballRec.top &&
+      ballRec.right > l &&
+      ballRec.left < r
+    ) {
+      brick.style.opacity = "0";
+      brick.className = "hidden";
+      ballClass.direction = "down";
+      changeSrc();
+      lifeLostDirectionChange = false;
+      playHitSound(); // TOCA SOM AQUI
+    }
+  });
+
+  var gridLength = grid.querySelectorAll(".hidden").length;
+  document.querySelector("#score").textContent = gridLength;
+
+  if (gridLength == 40) {
+    win = true;
+    return;
+  }
+
+  if (
+    ballRec.bottom >= playerRect.top &&
+    ballRec.right >= playerRect.left &&
+    ballRec.left <= playerRect.right
+  ) {
+    ballClass.direction = "up";
+    changeSrc();
+  }
+
+  if (lifeLostDirectionChange) {
+    lifeLostDirectionChange = false;
+    ballClass.bottom += 2;
+    ballClass.direction = "up";
+    changeSrc();
+  }
+
+  if (ballRec.right >= gameRect.right) {
+    ballClass.directionX = "left";
+  }
+
+  if (ballRec.left <= gameRect.left) {
+    ballClass.directionX = "right";
+  }
+}
