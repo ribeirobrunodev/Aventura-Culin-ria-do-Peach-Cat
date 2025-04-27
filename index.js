@@ -104,7 +104,6 @@ var sCount = 0;
 var pCount = 1;
 
 function MovePlayer(event) {
-  start(event);
   if (!gameStart) return;
 
   switch (event.key) {
@@ -135,6 +134,102 @@ ballbox.appendChild(ball);
 gameContainer.appendChild(ballbox);
 
 ballbox.style.left = `${gameContainerRect.width / 2 - ballbox.getBoundingClientRect().width / 2}px`;
+
+// Mobile touch control
+let touchStartX = null;
+let touchStartY = null;
+
+gameContainer.addEventListener("touchstart", handleTouchStart);
+gameContainer.addEventListener("touchmove", handleTouchMove);
+gameContainer.addEventListener("touchend", handleTouchEnd);
+
+function handleTouchStart(event) {
+  const touch = event.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+}
+
+function handleTouchMove(event) {
+  if (!touchStartX || !touchStartY) return;
+  const touch = event.touches[0];
+  const deltaX = touch.clientX - touchStartX;
+  const deltaY = touch.clientY - touchStartY;
+  const sensitivity = 30;
+
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (deltaX > sensitivity) {
+      if (position < gameContainerRect.width - 120) {
+        position += 18;
+        drawPlayer();
+      }
+    } else if (deltaX < -sensitivity) {
+      if (position > 0) {
+        position -= 18;
+        drawPlayer();
+      }
+    }
+    touchStartX = null;
+    touchStartY = null;
+  }
+}
+
+function handleTouchEnd(event) {
+  touchStartX = null;
+  touchStartY = null;
+}
+
+// Start game (separado!)
+function startGame() {
+  if (!gameStart && sCount === 0) {
+    if (startScreen) startScreen.style.display = "none";
+    ball.src = `./src/assets/gat5.gif`;
+    ball.id = "";
+    ball.className = "center";
+    Game();
+    InitTimer();
+    sCount++;
+    gameStart = true;
+  }
+}
+
+// Start event para teclado
+function start(event) {
+  if (event.key === "Enter") {
+    startGame();
+  }
+  if (event.key === "p" && pCount % 2 === 1) {
+    Pause();
+    pCount++;
+  } else if (event.key === "p" && pCount % 2 === 0) {
+    Resume();
+    pCount++;
+  }
+  if (paused && event.key === "r") {
+    Reload();
+  }
+}
+
+window.addEventListener("keydown", MovePlayer);
+window.addEventListener("keydown", start);
+
+// Também iniciar ao clicar/tocar
+function isMobile() {
+  return /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
+}
+
+gameContainer.addEventListener("touchstart", function (e) {
+  if (!e.target.closest("#pause-menu") && !e.target.closest("#start-screen")) {
+    if (isMobile()) {
+      startGame();
+    }
+  }
+});
+
+gameContainer.addEventListener("touchstart", function (e) {
+  if (!e.target.closest("#pause-menu") && !e.target.closest("#start-screen")) {
+    startGame();
+  }
+});
 
 // Collision and Movement
 var c = 2;
@@ -179,6 +274,7 @@ function CheckCollision() {
       ballClass.direction = "down";
       changeSrc();
       lifeLostDirectionChange = false;
+      playHitSound();
     }
   });
 
@@ -221,10 +317,8 @@ function MoveBall() {
 
   if (ballClass.direction == "up") ballClass.moveUp();
   if (ballClass.direction == "down") ballClass.moveDown();
-
   if (ballClass.directionX == "left") ballClass.moveLeft();
   else if (ballClass.directionX == "right") ballClass.moveRight();
-
   if (ballClass.directionX == null) ballClass.moveRandom();
 
   if (ballClass.bottom <= 30) {
@@ -233,33 +327,6 @@ function MoveBall() {
     return;
   }
 }
-
-// Start Game
-function start(event) {
-  if (event.key === "Enter" && sCount === 0) {
-    if (startScreen) startScreen.style.display = "none";
-    ball.src = `./src/assets/gat5.gif`;
-    ball.id = "";
-    ball.className = "center";
-    Game();
-    InitTimer();
-    sCount++;
-    gameStart = true;
-  }
-  if (event.key === "p" && pCount % 2 === 1) {
-    Pause();
-    pCount++;
-  } else if (event.key === "p" && pCount % 2 === 0) {
-    Resume();
-    pCount++;
-  }
-
-  if (paused && event.key === "r") {
-    Reload();
-  }
-}
-
-window.addEventListener("keydown", MovePlayer);
 
 // Main loop
 function Game() {
@@ -354,61 +421,27 @@ function preloadImage(url) {
   img.src = url;
 }
 
-// MOBILE TOUCH CONTROLS
-let touchStartX = null;
-let touchStartY = null;
-
-gameContainer.addEventListener("touchstart", handleTouchStart);
-gameContainer.addEventListener("touchmove", handleTouchMove);
-gameContainer.addEventListener("touchend", handleTouchEnd);
-
-function handleTouchStart(event) {
-  const touch = event.touches[0];
-  touchStartX = touch.clientX;
-  touchStartY = touch.clientY;
-}
-
-function handleTouchMove(event) {
-  if (!touchStartX || !touchStartY) return;
-  const touch = event.touches[0];
-  const deltaX = touch.clientX - touchStartX;
-  const deltaY = touch.clientY - touchStartY;
-  const sensitivity = 30;
-
-  if (Math.abs(deltaX) > Math.abs(deltaY)) {
-    if (deltaX > sensitivity) {
-      // Swipe para direita
-      if (position < gameContainerRect.width - 120) {
-        position += 18;
-        drawPlayer();
-      }
-    } else if (deltaX < -sensitivity) {
-      // Swipe para esquerda
-      if (position > 0) {
-        position -= 18;
-        drawPlayer();
-      }
-    }
-    touchStartX = null;
-    touchStartY = null;
-  }
-}
-
-function handleTouchEnd(event) {
-  touchStartX = null;
-  touchStartY = null;
-}
-
-
-// SOM QUANDO ACERTA BLOCOS
+// Som ao acertar bloco
 const hitSound = document.getElementById("hit-sound");
-
 function playHitSound() {
   if (hitSound) {
     hitSound.currentTime = 0;
     hitSound.play();
   }
+}  
+
+// button 
+const startButton = document.getElementById("start-button");
+if (startButton) {
+  startButton.addEventListener("click", startGame);
 }
+
+gameContainer.addEventListener("click", function (e) {
+  if (!e.target.closest("#pause-menu") && !e.target.closest("#start-screen")) {
+    startGame();
+  }
+});
+
 
 // MODIFICAR CheckCollision() para tocar o som:
 function CheckCollision() {
