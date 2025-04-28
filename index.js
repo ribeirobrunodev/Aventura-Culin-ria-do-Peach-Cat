@@ -139,10 +139,6 @@ ballbox.style.left = `${gameContainerRect.width / 2 - ballbox.getBoundingClientR
 let touchStartX = null;
 let touchStartY = null;
 
-gameContainer.addEventListener("touchstart", handleTouchStart);
-gameContainer.addEventListener("touchmove", handleTouchMove);
-gameContainer.addEventListener("touchend", handleTouchEnd);
-
 function handleTouchStart(event) {
   const touch = event.touches[0];
   touchStartX = touch.clientX;
@@ -178,7 +174,11 @@ function handleTouchEnd(event) {
   touchStartY = null;
 }
 
-// Start game (separado!)
+gameContainer.addEventListener("touchstart", handleTouchStart);
+gameContainer.addEventListener("touchmove", handleTouchMove);
+gameContainer.addEventListener("touchend", handleTouchEnd);
+
+// Start game
 function startGame() {
   if (!gameStart && sCount === 0) {
     if (startScreen) startScreen.style.display = "none";
@@ -193,40 +193,47 @@ function startGame() {
 }
 
 // Start event para teclado
+let clickCount = 0;
+
 function start(event) {
-  if (event.key === "Enter") {
-    startGame();
-  }
-  if (event.key === "p" && pCount % 2 === 1) {
-    Pause();
-    pCount++;
-  } else if (event.key === "p" && pCount % 2 === 0) {
-    Resume();
-    pCount++;
+  if (event.key === "Enter" || event.type === "click") {
+    clickCount++;
+
+    if (clickCount === 1) {
+      startGame();
+    }
+    else if (clickCount === 2) {
+      Pause();
+    }
+    else if (clickCount === 3) {
+      Resume();
+      clickCount = 1; // Reinicia a contagem para poder pausar de novo com 2 cliques
+    }
   }
   if (paused && event.key === "r") {
     Reload();
   }
 }
 
+
 window.addEventListener("keydown", MovePlayer);
 window.addEventListener("keydown", start);
 
-// Também iniciar ao clicar/tocar
+// Melhorado: só inicia se não clicar/tocar em botões e menus
 function isMobile() {
-  return /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
+  return /Android|iPhone|iPad|iPod|Windows Phone|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-gameContainer.addEventListener("touchstart", function (e) {
-  if (!e.target.closest("#pause-menu") && !e.target.closest("#start-screen")) {
-    if (isMobile()) {
-      startGame();
-    }
-  }
-});
 
-gameContainer.addEventListener("touchstart", function (e) {
-  if (!e.target.closest("#pause-menu") && !e.target.closest("#start-screen")) {
+
+gameContainer.addEventListener("click", function (e) {
+  if (
+    !e.target.closest("#pause-menu") &&
+    !e.target.closest("#start-screen") &&
+    !e.target.closest("#start-button") &&
+    !e.target.closest("#pause-button") &&
+    !gameStart
+  ) {
     startGame();
   }
 });
@@ -428,81 +435,11 @@ function playHitSound() {
     hitSound.currentTime = 0;
     hitSound.play();
   }
-}  
+}
 
-// button 
+// Botão start
 const startButton = document.getElementById("start-button");
 if (startButton) {
   startButton.addEventListener("click", startGame);
 }
 
-gameContainer.addEventListener("click", function (e) {
-  if (!e.target.closest("#pause-menu") && !e.target.closest("#start-screen")) {
-    startGame();
-  }
-});
-
-
-// MODIFICAR CheckCollision() para tocar o som:
-function CheckCollision() {
-  if (c % 3 == 0) ballRec = ballbox.getBoundingClientRect();
-  c++;
-
-  var playerRect = player.getBoundingClientRect();
-
-  if (ballRec.top <= gameRect.top) {
-    ballClass.moveDown();
-    ballClass.direction = "down";
-  }
-
-  blocks.forEach((brick) => {
-    var l = parseFloat(brick.dataset.left);
-    var r = parseFloat(brick.dataset.right);
-    var b = parseFloat(brick.dataset.bottom);
-    if (
-      brick.className != "hidden" &&
-      b >= ballRec.top &&
-      ballRec.right > l &&
-      ballRec.left < r
-    ) {
-      brick.style.opacity = "0";
-      brick.className = "hidden";
-      ballClass.direction = "down";
-      changeSrc();
-      lifeLostDirectionChange = false;
-      playHitSound(); // TOCA SOM AQUI
-    }
-  });
-
-  var gridLength = grid.querySelectorAll(".hidden").length;
-  document.querySelector("#score").textContent = gridLength;
-
-  if (gridLength == 40) {
-    win = true;
-    return;
-  }
-
-  if (
-    ballRec.bottom >= playerRect.top &&
-    ballRec.right >= playerRect.left &&
-    ballRec.left <= playerRect.right
-  ) {
-    ballClass.direction = "up";
-    changeSrc();
-  }
-
-  if (lifeLostDirectionChange) {
-    lifeLostDirectionChange = false;
-    ballClass.bottom += 2;
-    ballClass.direction = "up";
-    changeSrc();
-  }
-
-  if (ballRec.right >= gameRect.right) {
-    ballClass.directionX = "left";
-  }
-
-  if (ballRec.left <= gameRect.left) {
-    ballClass.directionX = "right";
-  }
-}
